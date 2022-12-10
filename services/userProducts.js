@@ -2,8 +2,8 @@ const UserProducts = require("../models/userProducts");
 
 async function getList(userid, userProductsType) {
   const userProducts = await UserProducts.findOne({
-    userid:userid,
-    userProductsType:userProductsType,
+    userid: userid,
+    userProductsType: userProductsType,
   });
   return userProducts;
 }
