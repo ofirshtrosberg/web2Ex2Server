@@ -1,42 +1,79 @@
+require("dotenv").config();
 const express = require("express");
-const { default: mongoose } = require("mongoose");
-const cors = require("cors");
 const app = express();
+const cors = require("cors");
+const session = require("express-session");
+const methodOverride = require("method-override");
+const { default: mongoose } = require("mongoose");
+const userProductsService = require("./services/userProducts");
+const productService = require("./services/product");
+
 const corsOptions = {
   origin: "*",
+  credentials: true,
   optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
-const Product = require("./models/Product");
-const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
-
+const oneDay = 1000 * 60 * 60 * 24;
+app.use(
+  session({
+    secret: "mysecrctekey",
+    saveUninitialized: true,
+    cookie: { maxAge: oneDay },
+    resave: false,
+  })
+);
 mongoose
-  .connect("mongodb://localhost:27017/farmStand", { useNewUrlParser: true })
+  .connect(process.env.CONNECTION_STRING, { useNewUrlParser: true })
   .then(() => {
-    console.log("mongo connection open!!");
+    console.log("mongo connection open");
   })
   .catch((err) => {
     console.log("no connection start");
   });
-
-// app.get("/addToMongo1/:title/:amount/:date", async (req, res) => {
-//   const { title, amount, date } = req.params;
-//   const addedProduct = new Product({
-//     title: title,
-//     amount: amount,
-//     date: date,
-//   });
-//   try {
-//     await addedProduct.save();
-//     res.status(200);
-//   } catch (e) {
-//     res.status(500);
-//   }
-// });
-
-app.listen(3000, () => {
-  console.log("listening on port 3000!");
+app.get("/", async (req, res) => {
+  //console.log("!!!!");
+  try {
+    const products = await productService.getAllProducts();
+    res.send(products);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
+app.get("/userProducts/:userProductsType", async (req, res) => {
+  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
+  const { userProductsType } = req.params;
+  console.log(userProductsType);
+  var productsDetails = [];
+  try {
+    const foundList = await userProductsService.getList(
+      userid,
+      userProductsType
+    );
+    if (!foundList) {
+      await userProductsService.createUserProducts(userid, userProductsType);
+    }
+    if (userProductsType == "shoppingBag") {
+      const productsIds = await userProductsService.getProductsIds(
+        userid,
+        userProductsType
+      );
+      for (const index in productsIds) {
+        const productDetails = await productService.getProduct(
+          productsIds[index]
+        );
+        productsDetails.push(productDetails);
+      }
+    }
+    res.json(productsDetails);
+
+    // else if(userProductsType == "wishList")
+    //else not found
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+app.listen(process.env.PORT);
