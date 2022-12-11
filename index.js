@@ -13,6 +13,9 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
+bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
@@ -35,7 +38,6 @@ mongoose
     console.log("no connection start");
   });
 app.get("/", async (req, res) => {
-  //console.log("!!!!");
   try {
     const products = await productService.getAllProducts();
     res.send(products);
@@ -43,10 +45,23 @@ app.get("/", async (req, res) => {
     res.status(500).send(error);
   }
 });
+app.post("/addProductToCart", async (req, res) => {
+  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
+  try {
+    const productToAdd = req.body.productToAdd;
+    await userProductsService.addProductToList(
+      userid,
+      productToAdd,
+      "shoppingBag"
+    );
+    res.status(200);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 app.get("/userProducts/:userProductsType", async (req, res) => {
   const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
   const { userProductsType } = req.params;
-  console.log(userProductsType);
   var productsDetails = [];
   try {
     const foundList = await userProductsService.getList(
@@ -57,13 +72,13 @@ app.get("/userProducts/:userProductsType", async (req, res) => {
       await userProductsService.createUserProducts(userid, userProductsType);
     }
     if (userProductsType == "shoppingBag") {
-      const productsIds = await userProductsService.getProductsIds(
+      const products = await userProductsService.getProductsIdsAndAmounts(
         userid,
         userProductsType
       );
-      for (const index in productsIds) {
+      for (const index in products) {
         const productDetails = await productService.getProduct(
-          productsIds[index]
+          products[index].productid
         );
         productsDetails.push(productDetails);
       }

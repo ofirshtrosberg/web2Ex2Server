@@ -8,4 +8,9 @@ async function getAllProducts() {
   const product = await Product.find({});
   return product;
 }
-module.exports = { getProduct, getAllProducts };
+async function isProductExsist(productid) {
+  const product = await Product.find({ _id: productid });
+  if (product) return true;
+  return false;
+}
+module.exports = { getProduct, getAllProducts, isProductExsist };
