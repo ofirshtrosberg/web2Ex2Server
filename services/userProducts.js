@@ -1,5 +1,6 @@
 const UserProducts = require("../models/userProducts");
 const productService = require("./product");
+var ObjectId = require("mongoose").Types.ObjectId;
 
 async function getList(userid, userProductsType) {
   const userProducts = await UserProducts.findOne({
@@ -65,10 +66,20 @@ async function removeAllUserProducts(userid) {
   return
   }
 async function deleteProduct(userid, userProductsType, productid){
-  // await UserProducts.updateOne(
-  //   { userid: userid, userProductsType, "products.productid": productid },
-  //   { $inc: { "products.$.amount": 1 } }
-  // );
+  var currentProducts = getProductsIdsAndAmounts(userid, userProductsType);
+  const productObjectId = new ObjectId(productid);
+  for (const index in currentProducts) {
+    if(currentProducts[index].productid === productObjectId)
+      if((await currentProducts).length != 1)
+        (await currentProducts).splice(index, 1);
+      else
+        currentProducts = 0
+  }
+  await UserProducts.updateOne({userid, userProductsType},{
+    $set:{
+      products:currentProducts
+    }
+  })
 }
 module.exports = {
   getList,
