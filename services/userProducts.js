@@ -57,10 +57,19 @@ async function addProductToList(userid, productid, userProductsType) {
     }
   }
 }
+
+async function removeAllUserProducts(userid) {
+  const userProducts = await UserProducts.deleteMany({
+    userid: userid,
+  })
+  return
+  }
+
 module.exports = {
   getList,
   createUserProducts,
   getProductsIdsAndAmounts,
   findProductInList,
   addProductToList,
+  removeAllUserProducts
 };

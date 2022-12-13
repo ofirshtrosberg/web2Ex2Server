@@ -91,4 +91,18 @@ app.get("/userProducts/:userProductsType", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
+app.get("/userProducts", async (req, res) => {
+  console.log("here");
+  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
+  try {
+    const foundList = await userProductsService.removeAllUserProducts(
+      userid,
+    );
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 app.listen(process.env.PORT);
