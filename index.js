@@ -104,17 +104,32 @@ app.get("/userProducts", async (req, res) => {
     res.status(500).send(error);
   }
 });
-app.delete("/userProducts/shoppingBag/delete/:productToDelete", async (req,res) => {
- /* const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
-  const {productToDelete} = req.params;
+app.post("/userProducts/shoppingBag/delete", async (req,res) => {
+  var productsDetails = [];
+  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
+  const productToDelete = req.body.productToDelete;
   try {
-    const productsAfterDelete = await userProductsService.deleteProduct(
+    console.log("1")
+    await userProductsService.deleteProduct(
       userid, "shoppingBag", productToDelete
     );
-    res.json(productsAfterDelete);
+    console.log("2")
+    const products = await userProductsService.getProductsIdsAndAmounts(
+      userid,
+      "shoppingBag"
+    );
+    console.log("3")
+    for (const index in products) {
+      const productDetails = await productService.getProduct(
+        products[index].productid
+      );
+      productsDetails.push(productDetails);
+    }
+    console.log("4")
+    res.json(productsDetails);
   } catch (error) {
     res.status(500).send(error);
-  }*/
+  }
 
 
 });
