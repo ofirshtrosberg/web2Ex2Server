@@ -104,5 +104,19 @@ app.get("/userProducts", async (req, res) => {
     res.status(500).send(error);
   }
 });
+app.delete("/userProducts/shoppingBag/delete/:productToDelete", async (req,res) => {
+  // const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
+  // const {productToDelete} = req.params;
+  // try {
+  //   const productsAfterDelete = await userProductsService.deleteProduct(
+  //     userid, "shoppingBag", productToDelete
+  //   );
+  //   res.json(productsAfterDelete);
+  // } catch (error) {
+  //   res.status(500).send(error);
+  // }
+
+});
+
 
 app.listen(process.env.PORT);
