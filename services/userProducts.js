@@ -65,10 +65,10 @@ async function removeAllUserProducts(userid) {
   return
   }
 async function deleteProduct(userid, userProductsType, productid){
-  // await UserProducts.updateOne(
-  //   { userid: userid, userProductsType, "products.productid": productid },
-  //   { $inc: { "products.$.amount": 1 } }
-  // );
+  /*await UserProducts.updateOne(
+    { userid: userid, userProductsType, "products.productid": productid },
+    { $pop: { "products" }
+  );*/
 }
 module.exports = {
   getList,
