@@ -32,7 +32,7 @@ async function findProductInList(userid, productid, userProductsType) {
   }).select("-_id products");
   const products = userProducts["products"];
   for (let i = 0; i < products.length; i++) {
-    if (productid == products[i].productid) return true;
+    if (productid == products[i]._id) return true;
   }
   return false;
 }
@@ -48,11 +48,11 @@ async function addProductToList(userid, productid, userProductsType) {
     if (!foundProductInList) {
       await UserProducts.updateOne(
         { userid: userid, userProductsType },
-        { $push: { products: { productid: productid, amount: 1 } } }
+        { $push: { products: { _id: productid, amount: 1 } } }
       );
     } else {
       await UserProducts.updateOne(
-        { userid: userid, userProductsType, "products.productid": productid },
+        { userid: userid, userProductsType, "products._id": productid },
         { $inc: { "products.$.amount": 1 } }
       );
     }
@@ -62,24 +62,28 @@ async function addProductToList(userid, productid, userProductsType) {
 async function removeAllUserProducts(userid) {
   const userProducts = await UserProducts.deleteMany({
     userid: userid,
-  })
-  return
-  }
-async function deleteProduct(userid, userProductsType, productid){
-  var currentProducts = getProductsIdsAndAmounts(userid, userProductsType);
-  const productObjectId = new ObjectId(productid);
-  for (const index in currentProducts) {
-    if(currentProducts[index].productid === productObjectId)
-      if((await currentProducts).length != 1)
-        (await currentProducts).splice(index, 1);
-      else
-        currentProducts = 0
-  }
-  await UserProducts.updateOne({userid, userProductsType},{
-    $set:{
-      products:currentProducts
+  });
+  return;
+}
+async function deleteProduct(userid, userProductsType, productid) {
+  var currentProducts = await getProductsIdsAndAmounts(
+    userid,
+    userProductsType
+  );
+  for (let i = 0; i < currentProducts.length; i++) {
+    if (currentProducts[i]._id.toString() == productid) {
+      currentProducts.splice(i, 1);
+      break;
     }
-  })
+  }
+  await UserProducts.updateOne(
+    { userid, userProductsType },
+    {
+      $set: {
+        products: currentProducts,
+      },
+    }
+  );
 }
 module.exports = {
   getList,
@@ -88,5 +92,5 @@ module.exports = {
   findProductInList,
   addProductToList,
   removeAllUserProducts,
-  deleteProduct
+  deleteProduct,
 };
