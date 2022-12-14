@@ -11,7 +11,12 @@ const userProducts = new mongoose.Schema(
       required: true,
     },
     products: {
-      type: [{ productid: mongoose.Schema.Types.ObjectId, amount: Number }],
+      type: [
+        {
+          _id: { type: mongoose.Schema.Types.ObjectId },
+          amount: { type: Number },
+        },
+      ],
       required: true,
     },
   },

@@ -78,7 +78,7 @@ app.get("/userProducts/:userProductsType", async (req, res) => {
       );
       for (const index in products) {
         const productDetails = await productService.getProduct(
-          products[index].productid
+          products[index]._id
         );
         productsDetails.push(productDetails);
       }
@@ -92,47 +92,39 @@ app.get("/userProducts/:userProductsType", async (req, res) => {
   }
 });
 
-
 app.get("/userProducts", async (req, res) => {
   console.log("here");
   const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
   try {
-    const foundList = await userProductsService.removeAllUserProducts(
-      userid,
-    );
+    const foundList = await userProductsService.removeAllUserProducts(userid);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-app.post("/userProducts/shoppingBag/delete", async (req,res) => {
+app.post("/userProducts/shoppingBag/delete", async (req, res) => {
   var productsDetails = [];
   const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
   const productToDelete = req.body.productToDelete;
   try {
-    console.log("1")
     await userProductsService.deleteProduct(
-      userid, "shoppingBag", productToDelete
+      userid,
+      "shoppingBag",
+      productToDelete
     );
-    console.log("2")
     const products = await userProductsService.getProductsIdsAndAmounts(
       userid,
       "shoppingBag"
     );
-    console.log("3")
     for (const index in products) {
       const productDetails = await productService.getProduct(
-        products[index].productid
+        products[index]._id
       );
       productsDetails.push(productDetails);
     }
-    console.log("4")
     res.json(productsDetails);
   } catch (error) {
     res.status(500).send(error);
   }
-
-
 });
-
 
 app.listen(process.env.PORT);
