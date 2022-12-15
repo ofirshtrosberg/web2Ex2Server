@@ -1,4 +1,5 @@
 const UserProducts = require("../models/userProducts");
+const Orders = require("../models/order");
 const productService = require("./product");
 
 async function getList(userid, userProductsType) {
@@ -70,6 +71,20 @@ async function deleteProduct(userid, userProductsType, productid){
   //   { $inc: { "products.$.amount": 1 } }
   // );
 }
+
+async function addorder(userId, client_name, credit_card_number) {
+  console.log("#addorder_userproduct");
+
+  const products = await getList(userId, "shoppingBag");
+  console.log(products);
+  Orders.create({
+    client_name: client_name,
+    credit_card_number:credit_card_number,
+    items: products
+  });
+}
+ 
+
 module.exports = {
   getList,
   createUserProducts,
@@ -77,5 +92,6 @@ module.exports = {
   findProductInList,
   addProductToList,
   removeAllUserProducts,
-  deleteProduct
+  deleteProduct,
+  addorder
 };
