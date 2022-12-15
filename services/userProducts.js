@@ -62,6 +62,42 @@ async function addProductToList(userid, productid, userProductsType) {
 async function removeAllUserProducts(userid) {
   const userProducts = await UserProducts.deleteMany({
     userid: userid,
+<<<<<<< Updated upstream
+=======
+  });
+  return;
+}
+async function deleteProduct(userid, userProductsType, productid) {
+  var currentProducts = await getProductsIdsAndAmounts(
+    userid,
+    userProductsType
+  );
+  for (let i = 0; i < currentProducts.length; i++) {
+    if (currentProducts[i]._id.toString() == productid) {
+      currentProducts.splice(i, 1);
+      break;
+    }
+  }
+  await UserProducts.updateOne(
+    { userid, userProductsType },
+    {
+      $set: {
+        products: currentProducts,
+      },
+    }
+  );
+}
+
+async function addorder(userId, client_name, credit_card_number) {
+  console.log("#addorder_userproduct");
+
+  const products = await getList(userId, "shoppingBag");
+  console.log(products);
+  Orders.create({
+    client_name: client_name,
+    credit_card_number:credit_card_number,
+    items: products
+>>>>>>> Stashed changes
   });
   return;
 }
