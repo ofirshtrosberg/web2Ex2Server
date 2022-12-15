@@ -76,11 +76,26 @@ app.get("/userProducts/:userProductsType", async (req, res) => {
         userid,
         userProductsType
       );
+      var productDetails;
+      var productDetailsPlusAmount = {
+        _id: "",
+        title: "",
+        imgsrc1: "",
+        imgsrc2: "",
+        description: "",
+        price: 0,
+        amount: 0,
+      };
       for (const index in products) {
-        const productDetails = await productService.getProduct(
-          products[index]._id
-        );
-        productsDetails.push(productDetails);
+        productDetails = await productService.getProduct(products[index]._id);
+        productDetailsPlusAmount._id = productDetails._id.toString();
+        productDetailsPlusAmount.title = productDetails.title;
+        productDetailsPlusAmount.imgsrc1 = productDetails.imgsrc1;
+        productDetailsPlusAmount.imgsrc2 = productDetails.imgsrc2;
+        productDetailsPlusAmount.description = productDetails.description;
+        productDetailsPlusAmount.price = productDetails.price;
+        productDetailsPlusAmount.amount = products[index].amount;
+        productsDetails.push(productDetailsPlusAmount);
       }
     }
     res.json(productsDetails);
