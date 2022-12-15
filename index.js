@@ -112,34 +112,6 @@ app.get("/userProducts", async (req, res) => {
   const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
   try {
     const foundList = await userProductsService.removeAllUserProducts(userid);
-<<<<<<< Updated upstream
-=======
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-app.post("/userProducts/shoppingBag/delete", async (req, res) => {
-  var productsDetails = [];
-  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
-  const productToDelete = req.body.productToDelete;
-  try {
-    await userProductsService.deleteProduct(
-      userid,
-      "shoppingBag",
-      productToDelete
-    );
-    const products = await userProductsService.getProductsIdsAndAmounts(
-      userid,
-      "shoppingBag"
-    );
-    for (const index in products) {
-      const productDetails = await productService.getProduct(
-        products[index]._id
-      );
-      productsDetails.push(productDetails);
-    }
-    res.json(productsDetails);
->>>>>>> Stashed changes
   } catch (error) {
     res.status(500).send(error);
   }
