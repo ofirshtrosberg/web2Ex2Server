@@ -142,4 +142,22 @@ app.post("/userProducts/shoppingBag/delete", async (req, res) => {
   }
 });
 
+app.post("/addOrder", async (req, res) => {
+  console.log("#addorder_index");
+  console.log(req.body.client_name)
+  console.log(req.body.credit_card_number)
+
+  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
+  try {
+    await userProductsService.addorder(
+      userid,
+      req.body.client_name,
+      req.body.credit_card_number
+    );
+    res.status(200);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 app.listen(process.env.PORT);

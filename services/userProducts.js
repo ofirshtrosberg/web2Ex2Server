@@ -1,5 +1,6 @@
 const UserProducts = require("../models/userProducts");
 const productService = require("./product");
+const Orders = require("../models/order");
 var ObjectId = require("mongoose").Types.ObjectId;
 
 async function getList(userid, userProductsType) {
@@ -85,6 +86,19 @@ async function deleteProduct(userid, userProductsType, productid) {
     }
   );
 }
+
+
+async function addorder(userId, client_name, credit_card_number) {
+  const products = await getList(userId, "shoppingBag");
+  Orders.create({
+    client_name: client_name,
+    credit_card_number:credit_card_number,
+    items: products
+  });
+}
+
+
+
 module.exports = {
   getList,
   createUserProducts,
@@ -93,4 +107,5 @@ module.exports = {
   addProductToList,
   removeAllUserProducts,
   deleteProduct,
+  addOrder
 };
