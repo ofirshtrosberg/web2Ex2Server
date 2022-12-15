@@ -1,6 +1,7 @@
 const UserProducts = require("../models/userProducts");
 const productService = require("./product");
-const Orders = require("../models/order");
+
+const Orders = require("../models/orders");
 var ObjectId = require("mongoose").Types.ObjectId;
 
 async function getList(userid, userProductsType) {
@@ -107,5 +108,5 @@ module.exports = {
   addProductToList,
   removeAllUserProducts,
   deleteProduct,
-  addOrder
+  addorder
 };
