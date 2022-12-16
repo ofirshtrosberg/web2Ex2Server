@@ -59,24 +59,16 @@ app.post("/addProductToCart", async (req, res) => {
     res.status(500).send(error);
   }
 });
-app.get("/userProducts/:userProductsType", async (req, res) => {
-  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
-  const { userProductsType } = req.params;
+async function fixProductsData(userProductsType, userid) {
   var productsDetails = [];
-  try {
-    const foundList = await userProductsService.getList(
+  if (userProductsType == "shoppingBag") {
+    const products = await userProductsService.getProductsIdsAndAmounts(
       userid,
       userProductsType
     );
-    if (!foundList) {
-      await userProductsService.createUserProducts(userid, userProductsType);
-    }
-    if (userProductsType == "shoppingBag") {
-      const products = await userProductsService.getProductsIdsAndAmounts(
-        userid,
-        userProductsType
-      );
-      var productDetails;
+    var productDetails;
+
+    for (const index in products) {
       var productDetailsPlusAmount = {
         _id: "",
         title: "",
@@ -86,18 +78,31 @@ app.get("/userProducts/:userProductsType", async (req, res) => {
         price: 0,
         amount: 0,
       };
-      for (const index in products) {
-        productDetails = await productService.getProduct(products[index]._id);
-        productDetailsPlusAmount._id = productDetails._id.toString();
-        productDetailsPlusAmount.title = productDetails.title;
-        productDetailsPlusAmount.imgsrc1 = productDetails.imgsrc1;
-        productDetailsPlusAmount.imgsrc2 = productDetails.imgsrc2;
-        productDetailsPlusAmount.description = productDetails.description;
-        productDetailsPlusAmount.price = productDetails.price;
-        productDetailsPlusAmount.amount = products[index].amount;
-        productsDetails.push(productDetailsPlusAmount);
-      }
+      productDetails = await productService.getProduct(products[index]._id);
+      productDetailsPlusAmount._id = productDetails._id.toString();
+      productDetailsPlusAmount.title = productDetails.title;
+      productDetailsPlusAmount.imgsrc1 = productDetails.imgsrc1;
+      productDetailsPlusAmount.imgsrc2 = productDetails.imgsrc2;
+      productDetailsPlusAmount.description = productDetails.description;
+      productDetailsPlusAmount.price = productDetails.price;
+      productDetailsPlusAmount.amount = products[index].amount;
+      productsDetails.push(productDetailsPlusAmount);
     }
+  }
+  return productsDetails;
+}
+app.get("/userProducts/:userProductsType", async (req, res) => {
+  const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
+  const { userProductsType } = req.params;
+  try {
+    const foundList = await userProductsService.getList(
+      userid,
+      userProductsType
+    );
+    if (!foundList) {
+      await userProductsService.createUserProducts(userid, userProductsType);
+    }
+    var productsDetails = await fixProductsData(userProductsType, userid);
     res.json(productsDetails);
 
     // else if(userProductsType == "wishList")
@@ -126,16 +131,9 @@ app.post("/userProducts/shoppingBag/delete", async (req, res) => {
       "shoppingBag",
       productToDelete
     );
-    const products = await userProductsService.getProductsIdsAndAmounts(
-      userid,
-      "shoppingBag"
-    );
-    for (const index in products) {
-      const productDetails = await productService.getProduct(
-        products[index]._id
-      );
-      productsDetails.push(productDetails);
-    }
+    var productsDetails = await fixProductsData("shoppingBag", userid);
+    // console.log("inside delete");
+    // console.log(productsDetails);
     res.json(productsDetails);
   } catch (error) {
     res.status(500).send(error);
