@@ -41,7 +41,6 @@ async function deleteProducts(req, res) {
   }
 }
 async function addOrder(req, res) {
-  console.log("1!!!!!");
   const userid = "6393b0349c67a2e0857e781f"; // in future will be = req.session.userId
   try {
     await userProductsService.addorder(
