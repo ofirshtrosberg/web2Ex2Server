@@ -88,17 +88,44 @@ async function deleteProduct(userid, userProductsType, productid) {
   );
 }
 
-
 async function addorder(userId, client_name, credit_card_number) {
   const products = await getList(userId, "shoppingBag");
-  Orders.create({
+  const order = new Orders({
     client_name: client_name,
-    credit_card_number:credit_card_number,
-    items: products
+    credit_card_number: credit_card_number,
+    items: products,
   });
+  await order.save();
 }
+async function fixProductsData(userProductsType, userid) {
+  var productsDetails = [];
+  if (userProductsType == "shoppingBag") {
+    const products = await getProductsIdsAndAmounts(userid, userProductsType);
+    var productDetails;
 
-
+    for (const index in products) {
+      var productDetailsPlusAmount = {
+        _id: "",
+        title: "",
+        imgsrc1: "",
+        imgsrc2: "",
+        description: "",
+        price: 0,
+        amount: 0,
+      };
+      productDetails = await productService.getProduct(products[index]._id);
+      productDetailsPlusAmount._id = productDetails._id.toString();
+      productDetailsPlusAmount.title = productDetails.title;
+      productDetailsPlusAmount.imgsrc1 = productDetails.imgsrc1;
+      productDetailsPlusAmount.imgsrc2 = productDetails.imgsrc2;
+      productDetailsPlusAmount.description = productDetails.description;
+      productDetailsPlusAmount.price = productDetails.price;
+      productDetailsPlusAmount.amount = products[index].amount;
+      productsDetails.push(productDetailsPlusAmount);
+    }
+  }
+  return productsDetails;
+}
 
 module.exports = {
   getList,
@@ -108,5 +135,6 @@ module.exports = {
   addProductToList,
   removeAllUserProducts,
   deleteProduct,
-  addorder
+  addorder,
+  fixProductsData,
 };

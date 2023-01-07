@@ -10,10 +10,8 @@ const order = new mongoose.Schema({
   },
   items: {
     type: Array,
-    required: true,
+    default:[],
   },
-
-
 });
 
 const Order = mongoose.model("Order", order);
